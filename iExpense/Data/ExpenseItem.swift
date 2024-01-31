@@ -8,7 +8,10 @@
 import Foundation
 
 // Simple struct for the expense items
-struct ExpenseItem {
+// Adding Identifiable to this struct just means that this type can now be identified uniquely. It has one requirement, which is that there must be a property called id that contains a unique identifier. In this case, we have id = UUID()
+// Now that we added this Identifiable protocol, we no longer need to tell ForEach which property to use for the identifier. It now knows there will be an id property.
+struct ExpenseItem: Identifiable {
+    let id = UUID()
     let name: String
     let type: String
     let amount: Double
