@@ -17,19 +17,25 @@ struct ContentView: View {
     
     // MARK: - METHODS
     
-    func removeItems(at offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
+    func removeItems(at offsets: IndexSet, in inputArray: [ExpenseItem]) {
+        var objectsToDelete = IndexSet()
+        
+        for offset in offsets {
+            let item = inputArray[offset]
+            
+            if let index = expenses.items.firstIndex(of: item) {
+                objectsToDelete.insert(index)
+            }
+        }
+        expenses.items.remove(atOffsets: objectsToDelete)
     }
     
-    func customColor(_ amount: Double) -> Color {
-        switch amount {
-        case ..<10: 
-            return .yellow
-        case 10..<100:
-            return .green
-        default:
-            return .red
-        }
+    func removePersonalItems(at offsets: IndexSet) {
+        removeItems(at: offsets, in: expenses.personalItems)
+    }
+    
+    func removeBusinessItems(at offsets: IndexSet) {
+        removeItems(at: offsets, in: expenses.businessItems)
     }
     
     // MARK: - BODY
@@ -37,24 +43,8 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                //Since we used the Identifiable protocol for our ExpenseItem, we no longer need specify for ForEach which id is unique. Therefore we can rewrite it
-                //ForEach(expenses.item, id: \.id) { item in
-                //    Text(item.name)
-                //}
-                ForEach(expenses.items) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
-                                .font(.footnote)
-                        }
-                        Spacer()
-                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
-                            .foregroundStyle(customColor(item.amount))
-                    }
-                }
-                .onDelete(perform: removeItems)
+                ExpenseSectionView(title: "Personal", expenses: expenses.personalItems, deleteItems: removePersonalItems)
+                ExpenseSectionView(title: "Business", expenses: expenses.businessItems, deleteItems: removeBusinessItems)
             }
             .navigationTitle("iExpense")
             .toolbar {

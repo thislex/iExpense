@@ -11,7 +11,7 @@ import Foundation
 // Adding Identifiable to this struct just means that this type can now be identified uniquely. It has one requirement, which is that there must be a property called id that contains a unique identifier. In this case, we have id = UUID()
 // Now that we added this Identifiable protocol, we no longer need to tell ForEach which property to use for the identifier. It now knows there will be an id property.
 
-struct ExpenseItem: Identifiable, Codable {
+struct ExpenseItem: Identifiable, Codable, Equatable {
     var id = UUID()
     let name: String
     let type: String
@@ -23,6 +23,15 @@ struct ExpenseItem: Identifiable, Codable {
 
 @Observable
 class Expenses {
+    
+    var personalItems: [ExpenseItem] {
+        items.filter { $0.type == "Personal"}
+    }
+    
+    var businessItems: [ExpenseItem] {
+        items.filter { $0.type == "Business"}
+    }
+    
     var items = [ExpenseItem]() {
         didSet {
             if let encoded = try? JSONEncoder().encode(items) {
