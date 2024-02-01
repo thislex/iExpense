@@ -18,7 +18,18 @@ struct ContentView: View {
     // MARK: - METHODS
     
     func removeItems(at offsets: IndexSet) {
-        expenses.item.remove(atOffsets: offsets)
+        expenses.items.remove(atOffsets: offsets)
+    }
+    
+    func customColor(_ amount: Double) -> Color {
+        switch amount {
+        case ..<10: 
+            return .yellow
+        case 10..<100:
+            return .green
+        default:
+            return .red
+        }
     }
     
     // MARK: - BODY
@@ -30,8 +41,18 @@ struct ContentView: View {
                 //ForEach(expenses.item, id: \.id) { item in
                 //    Text(item.name)
                 //}
-                ForEach(expenses.item) { item in
-                    Text(item.name)
+                ForEach(expenses.items) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                                .font(.footnote)
+                        }
+                        Spacer()
+                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                            .foregroundStyle(customColor(item.amount))
+                    }
                 }
                 .onDelete(perform: removeItems)
             }
